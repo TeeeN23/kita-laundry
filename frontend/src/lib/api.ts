@@ -1,0 +1,93 @@
+import axios from 'axios'
+import { useAuthStore } from '@/store/authStore'
+import { useSuperAdminStore } from '@/store/superAdminStore'
+import toast from 'react-hot-toast'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+
+// Create axios instance
+export const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,  // Send cookies with every request
+})
+
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  (config) => {
+    // Check if it's a superadmin route - use super admin token
+    const isSuperAdminRoute = config.url?.includes('superadmin')
+    
+    if (isSuperAdminRoute) {
+      const superAdminToken = useSuperAdminStore.getState().token
+      if (superAdminToken) {
+        config.headers.Authorization = `Bearer ${superAdminToken}`
+      }
+    } else {
+      // Use regular auth token for other routes
+      const token = useAuthStore.getState().token
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.message || 'Something went wrong'
+    const requestUrl = error.config?.url || ''
+    const isSuperAdminRoute = requestUrl.includes('superadmin')
+    const errorCode = error.response?.data?.code
+    
+    if (error.response?.status === 401) {
+      // Check if store is hydrated before showing session expired
+      const authStore = useAuthStore.getState()
+      const superAdminStore = useSuperAdminStore.getState()
+      
+      if (isSuperAdminRoute) {
+        // Only show session expired if user was actually logged in
+        if (superAdminStore.token) {
+          superAdminStore.logout()
+          toast.error('Session expired. Please login again.')
+          window.location.href = '/superadmin/auth/login'
+        }
+      } else {
+        // Only show session expired if user was actually logged in
+        if (authStore.token && authStore._hasHydrated) {
+          authStore.logout()
+          toast.error('Session expired. Please login again.')
+          window.location.href = '/auth/login'
+        }
+      }
+    } else if (error.response?.status === 403) {
+      // Don't show toast for PERMISSION_DENIED errors - let components handle it silently
+      if (errorCode !== 'PERMISSION_DENIED') {
+        toast.error(message)
+      }
+    } else if (error.response?.status >= 400) {
+      toast.error(message)
+    }
+    
+    return Promise.reject(error)
+  }
+)
+
+import { mockAuthAPI, mockCustomerAPI, mockServicesAPI, mockAdminAPI, mockBarcodeAPI } from './mockApi'
+
+// Export mock APIs instead of real ones for frontend demonstration
+export const authAPI = mockAuthAPI
+export const customerAPI = mockCustomerAPI
+export const servicesAPI = mockServicesAPI
+export const adminAPI = mockAdminAPI
+export const barcodeAPI = mockBarcodeAPI
+
+export default api
