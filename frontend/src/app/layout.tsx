@@ -16,8 +16,8 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: 'Laundry Management System',
-  description: 'Complete laundry management solution with order tracking, branch management, and customer support',
+  title: 'KitaLaundry | Premium Laundry & Dry Cleaning',
+  description: 'KitaLaundry provides professional laundry, dry cleaning, and ironing services with free doorstep pickup and delivery in Medan.',
 }
 
 export default function RootLayout({
