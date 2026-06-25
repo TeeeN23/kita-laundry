@@ -196,4 +196,52 @@ for i in {1..10}; do curl -i -X POST -H "Content-Type: application/json" -d '{"e
 7. Pada *request* ke-6, Anda akan melihat status *response* berubah menjadi `429 Too Many Requests` beserta pesan error di bagian *body response*.
 
 ---
+
+## 🎓 Panduan Presentasi Ujian Akhir
+Bagian ini menjelaskan struktur teknis dari aplikasi KitaLaundry untuk kebutuhan presentasi ujian.
+
+### 1. Setting API di Frontend
+Semua pengaturan API *frontend* yang menghubungkan aplikasi Next.js ke *backend* Rails terpusat pada file dan folder berikut:
+- **`frontend/src/lib/api.ts`**: Merupakan titik pusat konfigurasi *interceptors*, *base URL*, serta fungsi-fungsi utama seperti otentikasi (`login`, `register`, `logout`) dan penanganan *token* JWT.
+- **`frontend/src/lib/centerAdminApi.ts`**: Menyimpan fungsi-fungsi pemanggilan API khusus untuk *role* Admin Pusat (Center Admin) dan Admin Cabang (Branch Manager), seperti pengambilan metrik, *assign* staf, dll.
+
+### 2. Routing Frontend
+Aplikasi ini menggunakan **Next.js 14 App Router**. *Routing* dapat ditemukan di dalam direktori **`frontend/src/app/`**. Berikut adalah rinciannya:
+- **Pelanggan (Customer)**: Semua halaman terkait pelanggan berada di folder `customer/` (contoh: `app/customer/dashboard`, `app/customer/orders`).
+- **Admin Cabang**: Semua halaman manajemen cabang berada di folder `branch/` (contoh: `app/branch/orders`, `app/branch/staff`).
+- **Admin Pusat**: Semua halaman utama sistem administrasi berada di folder `admin/`.
+- **Halaman Publik**: Berada langsung di luar (*root* folder `app`), seperti `page.tsx` (Beranda), `login/page.tsx` (Login), dan `register/page.tsx`.
+
+### 3. Routing Backend
+Semua pengaturan *endpoint* (URL API) *backend* berada di file tunggal:
+- **`backend/config/routes.rb`**: Mengatur rute API, *namespace* (`api/v1`), serta pemisahan kontroler berdasarkan *role* (seperti `namespace :admin`, `namespace :branch`).
+
+### 4. Pengaturan MVC di Ruby on Rails
+Proyek ini mengadopsi pola MVC (*Model-View-Controller*). Karena bertindak sebagai *API-only*, peran *View* digantikan oleh respon berformat JSON:
+- **Models**: Terletak di **`backend/app/models/`**. Di sini didefinisikan struktur dan relasi tabel (contoh: `user.rb`, `order.rb`, `review.rb`).
+- **Controllers**: Terletak di **`backend/app/controllers/`**. Dibagi ke dalam berbagai *namespace* seperti `admin/`, `branch/`, `customer/`, dan `auth_controller.rb` untuk menangani logika bisnis dan memproses permintaan HTTP.
+- **Views (JSON)**: Data dirender dalam format JSON langsung dari *controller* tanpa menggunakan HTML Views tradisional Rails.
+
+### 5. Struktur Database
+Database yang digunakan adalah **PostgreSQL**. Struktur dari seluruh tabel tersimpan di dalam file skema:
+- **`backend/db/schema.rb`**: File ini memuat bentuk terkini dari seluruh relasi *database*.
+- **Cara Mengakses Database**:
+  Anda dapat menggunakan *console* bawaan Rails untuk membaca dan memanipulasi *database* secara langsung melalui WSL:
+  ```bash
+  cd backend
+  bin/rails console
+  # Contoh perintah di dalam console:
+  Order.count
+  User.where(role: 'customer')
+  ```
+  Anda juga dapat mengaksesnya secara visual melalui DBMS GUI (seperti DBeaver atau pgAdmin) dengan koneksi ke `localhost` pada port bawaan PostgreSQL (5432).
+
+### 6. Lokasi Fitur-Fitur Utama yang Dikembangkan
+- **Fitur Autentikasi & JWT**: `backend/app/controllers/api/v1/auth_controller.rb` dan UI di `frontend/src/app/login/page.tsx`.
+- **Fitur Pemesanan & Invoice (Xendit)**: `backend/app/controllers/customer/orders_controller.rb` (Fungsi `create`) dan UI di `frontend/src/app/customer/orders/new/page.tsx`.
+- **Sistem Proteksi DDoS (Rate Limiting)**: `backend/config/initializers/rack_attack.rb`.
+- **Sistem Ulasan (Star Reviews)**: `backend/app/controllers/admin/orders_controller.rb` (Serialisasi response atribut ulasan) dan UI di `frontend/src/app/customer/orders/page.tsx`.
+- **Sistem Penugasan Cerdas (Assign Driver/Staff)**: `backend/app/controllers/admin/orders_controller.rb` (Fungsi `assign_to_branch` dan `assign_staff`) dan UI di `frontend/src/app/admin/orders/page.tsx`.
+
+---
 *Dokumentasi ini otomatis digenerate dan diperbarui pada rilis integrasi Fase 6 (Eksternal) beserta fitur Ulasan & Rate Limiting.*
