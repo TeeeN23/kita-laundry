@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  category: MyString
+  name: MyString
+  service_type: MyString
+  base_price: 1
+
+two:
+  category: MyString
+  name: MyString
+  service_type: MyString
+  base_price: 1

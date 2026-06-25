@@ -1,0 +1,32 @@
+upstream backend_app {
+  # Path to Puma socket or port
+  # server unix:///home/ubuntu/KitaLaundry/backend/tmp/sockets/puma.sock fail_timeout=0;
+  server 127.0.0.1:3000 fail_timeout=0;
+}
+
+server {
+  listen 80;
+  server_name api.kitalaundry.com; # Replace with your domain or IP
+
+  root /home/ubuntu/KitaLaundry/backend/public;
+
+  location / {
+    proxy_pass http://backend_app;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+
+  # WebSocket support for ActionCable
+  location /cable {
+    proxy_pass http://backend_app;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+  }
+}

@@ -1,0 +1,19 @@
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+/home/danbilaesok/.local/share/mise/installs/ruby/3.4.9/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make -j9 DESTDIR\= sitearchdir\=./.gem.20260609-12808-wl0bx2 sitelibdir\=./.gem.20260609-12808-wl0bx2 clean
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make -j9 DESTDIR\= sitearchdir\=./.gem.20260609-12808-wl0bx2 sitelibdir\=./.gem.20260609-12808-wl0bx2
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.so
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make -j9 DESTDIR\= sitearchdir\=./.gem.20260609-12808-wl0bx2 sitelibdir\=./.gem.20260609-12808-wl0bx2 install
+/usr/bin/install -c -m 0755 debug.so ./.gem.20260609-12808-wl0bx2/debug
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260609-12808-wl0bx2 sitelibdir\=./.gem.20260609-12808-wl0bx2 clean

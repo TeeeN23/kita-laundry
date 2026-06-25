@@ -1,0 +1,19 @@
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/stringio-3.2.0/ext/stringio
+/home/danbilaesok/.local/share/mise/installs/ruby/3.4.9/bin/ruby extconf.rb
+checking for rb_io_mode_t in ruby/io.h... no
+creating Makefile
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/stringio-3.2.0/ext/stringio
+make -j9 DESTDIR\= sitearchdir\=./.gem.20260612-122039-ext4pj sitelibdir\=./.gem.20260612-122039-ext4pj clean
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/stringio-3.2.0/ext/stringio
+make -j9 DESTDIR\= sitearchdir\=./.gem.20260612-122039-ext4pj sitelibdir\=./.gem.20260612-122039-ext4pj
+compiling stringio.c
+linking shared-object stringio.so
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/stringio-3.2.0/ext/stringio
+make -j9 DESTDIR\= sitearchdir\=./.gem.20260612-122039-ext4pj sitelibdir\=./.gem.20260612-122039-ext4pj install
+/usr/bin/install -c -m 0755 stringio.so ./.gem.20260612-122039-ext4pj
+
+current directory: /home/danbilaesok/KitaLaundry/backend/vendor/bundle/ruby/3.4.0/gems/stringio-3.2.0/ext/stringio
+make DESTDIR\= sitearchdir\=./.gem.20260612-122039-ext4pj sitelibdir\=./.gem.20260612-122039-ext4pj clean
