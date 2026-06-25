@@ -18,7 +18,8 @@ import {
   Loader2,
   X,
   Zap,
-  Download
+  Download,
+  Star
 } from 'lucide-react'
 import { branchApi, centerAdminApi } from '@/lib/centerAdminApi'
 import toast from 'react-hot-toast'
@@ -37,6 +38,10 @@ interface Order {
   specialInstructions?: string
   serviceType?: string
   createdAt: string
+  review?: {
+    rating: number
+    comment?: string
+  }
 }
 
 interface Staff {
@@ -399,6 +404,13 @@ export default function BranchOrdersPage() {
                           <Package className="w-4 h-4 mr-1" />
                           {order.items?.length || 0} items
                         </div>
+                        {order.review && (
+                          <div className="flex items-center text-yellow-500">
+                            <Star className="w-4 h-4 mr-1 fill-current" />
+                            <span className="font-medium">{order.review.rating}/5</span>
+                            {order.review.comment && <span className="ml-1 text-gray-500 truncate text-xs">"{order.review.comment}"</span>}
+                          </div>
+                        )}
                         <div className="flex items-center">
                           <Banknote className="w-4 h-4 mr-1" />
                           {order.pricing?.total?.toLocaleString() || 0}

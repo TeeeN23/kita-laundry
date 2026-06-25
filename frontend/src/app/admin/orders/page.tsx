@@ -32,7 +32,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  Star
 } from 'lucide-react'
 import { useAdminOrders, useLogisticsPartners } from '@/hooks/useAdmin'
 import toast from 'react-hot-toast'
@@ -93,6 +94,10 @@ interface Order {
     city: string
     pincode: string
     phone: string
+  }
+  review?: {
+    rating: number
+    comment?: string
   }
 }
 
@@ -544,7 +549,18 @@ export default function AdminOrdersPage() {
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600">
                           <div className="flex items-center"><User className="w-4 h-4 mr-1" />{order.customer?.name}</div>
+                          <div className="flex items-center"><Phone className="w-4 h-4 mr-1" />{order.customer?.phone}</div>
+                          {order.branch && (
+                            <div className="flex items-center text-teal-600"><Building2 className="w-4 h-4 mr-1" />{order.branch.name}</div>
+                          )}
                           <div className="flex items-center"><Package className="w-4 h-4 mr-1" />{order.items?.length || 0} items</div>
+                          {order.review && (
+                            <div className="flex items-center text-yellow-500">
+                              <Star className="w-4 h-4 mr-1 fill-current" />
+                              <span className="font-medium">{order.review.rating}/5</span>
+                              {order.review.comment && <span className="ml-1 text-gray-500 truncate text-xs">"{order.review.comment}"</span>}
+                            </div>
+                          )}
                           <div className="flex items-center"><Calendar className="w-4 h-4 mr-1" />{new Date(order.createdAt).toLocaleDateString('en-IN')}</div>
                           <div className="flex items-center"><Banknote className="w-4 h-4 mr-1" />{order.pricing?.total?.toLocaleString()}</div>
                         </div>

@@ -60,7 +60,8 @@ module Admin
           branchId: order.branch_id.to_s,
           pickupDate: order.created_at.iso8601,
           serviceType: order.service_type,
-          items: order.order_items.map { |item| { serviceType: item.service.name, quantity: item.weight_kg, totalPrice: (item.weight_kg * item.service.price_per_kg).to_f } }
+          items: order.order_items.map { |item| { serviceType: item.service.name, quantity: item.weight_kg, totalPrice: (item.weight_kg * item.service.price_per_kg).to_f } },
+          review: order.review ? { rating: order.review.rating, comment: order.review.comment } : nil
         }
       end
 
