@@ -263,7 +263,7 @@ export default function PricingPage() {
           <p className="text-xl text-teal-100 mb-8 max-w-2xl mx-auto">
             Layanan laundry berkualitas dengan harga terjangkau. Tidak ada biaya tersembunyi.
           </p>
-          <Link href="https://wa.me/919876543210" target="_blank">
+          <Link href="https://wa.me/6281273136685" target="_blank">
             <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white">
               Chat di WhatsApp
             </Button>

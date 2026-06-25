@@ -204,7 +204,7 @@ export default function HelpPage() {
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">WhatsApp</h3>
               <p className="text-gray-500 mb-4">Quick chat support</p>
-              <a href="https://wa.me/911234567890" target="_blank" rel="noopener noreferrer" className="text-green-600 font-semibold text-lg hover:text-green-700">
+              <a href="https://wa.me/6281273136685" target="_blank" rel="noopener noreferrer" className="text-green-600 font-semibold text-lg hover:text-green-700">
                 Chat Now
               </a>
             </div>

@@ -90,7 +90,7 @@ function HeroCarousel({
       image: '/images/hero-laundry.jpg',
       discount: '20%',
       primaryButton: { text: 'Pesan Sekarang', icon: Truck, action: 'book' },
-      secondaryButton: { text: 'Chat di WhatsApp', icon: Phone, href: '#' },
+      secondaryButton: { text: 'Chat di WhatsApp', icon: Phone, href: 'https://wa.me/6281273136685' },
     },
     {
       id: 2,
@@ -255,7 +255,7 @@ function HeroCarousel({
                   <Truck className="w-5 h-5 mr-2" />
                   {currentSlideData.primaryButton.text}
                 </Button>
-                <Link href="https://wa.me/919876543210" target="_blank">
+                <Link href="https://wa.me/6281273136685" target="_blank">
                   <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-6">
                     <Phone className="w-5 h-5 mr-2" />
                     Chat di WhatsApp
@@ -736,7 +736,7 @@ export default function HomePage() {
                       Jadwalkan Penjemputan Gratis
                     </Button>
                   )}
-                  <Link href="https://wa.me/919876543210" target="_blank">
+                  <Link href="https://wa.me/6281273136685" target="_blank">
                     <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white w-full sm:w-auto shadow-lg">
                       <Phone className="w-5 h-5 mr-2" />
                       Chat di WhatsApp
@@ -783,7 +783,7 @@ export default function HomePage() {
                   Schedule Free Pickup
                 </Button>
               )}
-              <Link href="https://wa.me/919876543210" target="_blank">
+              <Link href="https://wa.me/6281273136685" target="_blank">
                 <Button variant="outline" className="border-teal-500 text-teal-500 hover:bg-teal-50">
                   Chat di WhatsApp
                 </Button>

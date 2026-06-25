@@ -287,7 +287,7 @@ export default function ServicesPage() {
               <Button size="lg" className="bg-gray-800 hover:bg-gray-900 text-white" onClick={handleBookNow}>
                 <Truck className="w-5 h-5 mr-2" />Jadwalkan Penjemputan Gratis
               </Button>
-              <Link href="https://wa.me/919876543210" target="_blank">
+              <Link href="https://wa.me/6281273136685" target="_blank">
                 <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white">
                   <Phone className="w-5 h-5 mr-2" />Chat di WhatsApp
                 </Button>
