@@ -180,5 +180,20 @@ for i in {1..10}; do curl -i -X POST -H "Content-Type: application/json" -d '{"e
 ```
 *   **Hasil yang Diharapkan:** Pada 5 panggilan pertama (dalam rentang waktu 20 detik), *server* akan mengembalikan respons `401 Unauthorized` (karena *password* salah). Namun, pada panggilan ke-6 dan seterusnya, *server* akan mengembalikan respons HTTP `429 Too Many Requests` dengan pesan *"Too Many Requests. Please wait and try again later."* 
 
+**Cara Pengujian via Postman:**
+1. Buka aplikasi **Postman**.
+2. Buat *request* baru dengan metode **POST**.
+3. Masukkan URL: `http://localhost:8000/api/v1/auth/login`.
+4. Pindah ke tab **Body**, pilih **raw**, lalu ubah format menjadi **JSON**.
+5. Masukkan *payload* JSON berikut:
+   ```json
+   {
+     "email": "test@test.com",
+     "password": "123"
+   }
+   ```
+6. Klik tombol **Send** secara berulang-ulang dan cepat (minimal 6 kali).
+7. Pada *request* ke-6, Anda akan melihat status *response* berubah menjadi `429 Too Many Requests` beserta pesan error di bagian *body response*.
+
 ---
 *Dokumentasi ini otomatis digenerate dan diperbarui pada rilis integrasi Fase 6 (Eksternal) beserta fitur Ulasan & Rate Limiting.*
