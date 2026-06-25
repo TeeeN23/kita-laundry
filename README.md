@@ -28,6 +28,8 @@ KitaLaundry adalah sistem manajemen operasional dan layanan binatu (laundry) yan
 - **Staff Assignment Hard Limit**: Sistem otomatis memblokir penugasan pesanan baru kepada staf yang sedang menangani maksimal 3 pesanan berstatus *Processing* untuk mencegah beban kerja berlebih (Overwork Protection).
 - **Strict Multi-Stage Workflow**: Alur penugasan dibuat ketat. Pesanan harus ditandai sebagai *Arrived / Picked Up* di cabang terlebih dahulu sebelum Admin Cabang dapat melemparnya (Assign Staff) kepada staf mesin cuci. Mencegah error operasional barang belum datang tapi sudah diproses.
 - **Smart Delivery Workflow**: Membedakan alur secara spesifik antara layanan antar-jemput (*Full Service*) dan antar-sendiri (*Self Drop*). Admin wajib "Assign Driver" khusus untuk order yang butuh penjemputan sebelum barang dinyatakan tiba di cabang.
+- **Proteksi DDoS & Brute Force (Rate Limiting)**: Pengamanan API Login dan Registrasi menggunakan `rack-attack` untuk memblokir serangan spam.
+- **Sistem Ulasan (Star Reviews)**: Pelanggan dapat memberikan *rating* bintang (1-5) beserta komentar setelah pesanan selesai (*Delivered*).
 ---
 
 ## 🚀 Panduan Instalasi & Menjalankan Aplikasi
@@ -166,4 +168,17 @@ Untuk menguji *frontend* Vercel langsung ke *backend* lokal Anda, kita akan meng
 5. Masuk menggunakan akun **Center Admin** (`admin@kitalaundry.com`) untuk melihat data analitik, tabel seluruh pesanan, atau merespons tiket keluhan.
 
 ---
-*Dokumentasi ini otomatis digenerate dan diperbarui pada rilis integrasi Fase 6 (Eksternal).*
+### 🛠️ Tutorial Testing Fitur Keamanan (Rate Limiting)
+
+Fitur **Rate Limiting (Rack Attack)** akan memblokir *request* yang berlebihan (serangan DDoS atau *brute force*) dari satu IP.
+Untuk mengujinya, lakukan simulasi menggunakan aplikasi **Postman**, **cURL**, atau langsung melalui Browser:
+
+**Cara Pengujian via cURL (Terminal):**
+Buka terminal dan jalankan *script* berikut secara berturut-turut untuk melakukan *hit* beruntun ke *endpoint* Login:
+```bash
+for i in {1..10}; do curl -i -X POST -H "Content-Type: application/json" -d '{"email":"test@test.com", "password":"123"}' http://localhost:8000/api/v1/auth/login; done
+```
+*   **Hasil yang Diharapkan:** Pada 5 panggilan pertama (dalam rentang waktu 20 detik), *server* akan mengembalikan respons `401 Unauthorized` (karena *password* salah). Namun, pada panggilan ke-6 dan seterusnya, *server* akan mengembalikan respons HTTP `429 Too Many Requests` dengan pesan *"Too Many Requests. Please wait and try again later."* 
+
+---
+*Dokumentasi ini otomatis digenerate dan diperbarui pada rilis integrasi Fase 6 (Eksternal) beserta fitur Ulasan & Rate Limiting.*

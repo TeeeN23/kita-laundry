@@ -22,6 +22,8 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import { useOrders } from '@/hooks/useOrders'
+import { customerAPI } from '@/lib/api'
+import { toast } from 'react-hot-toast'
 
 const ITEMS_PER_PAGE = 8
 
@@ -44,6 +46,39 @@ export default function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
+
+  // Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+
+  const openReviewModal = (orderId: string) => {
+    setSelectedOrderId(orderId)
+    setReviewRating(0)
+    setReviewComment('')
+    setIsReviewModalOpen(true)
+  }
+
+  const handleSubmitReview = async () => {
+    if (!selectedOrderId || reviewRating === 0) {
+      toast.error('Silakan pilih rating bintang terlebih dahulu.')
+      return
+    }
+    
+    setIsSubmittingReview(true)
+    try {
+      await customerAPI.submitReview(selectedOrderId, reviewRating, reviewComment)
+      toast.success('Ulasan berhasil dikirim!')
+      setIsReviewModalOpen(false)
+      fetchOrders() // Refresh pesanan untuk menampilkan ulasan
+    } catch (error) {
+      toast.error('Gagal mengirim ulasan.')
+    } finally {
+      setIsSubmittingReview(false)
+    }
+  }
 
   useEffect(() => {
     const searchFromUrl = searchParams.get('search')
@@ -214,11 +249,18 @@ export default function OrdersPage() {
                             Lihat
                           </Button>
                         </Link>
-                        {order.status === 'delivered' && !order.rating?.score && (
-                          <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                        {order.status === 'delivered' && !order.review && (
+                          <Button size="sm" onClick={() => openReviewModal(order._id)} className="bg-yellow-500 hover:bg-yellow-600 text-white">
                             <Star className="w-4 h-4 mr-1" />
-                            Nilai
+                            Beri Ulasan
                           </Button>
+                        )}
+                        {order.review && (
+                          <div className="flex items-center text-yellow-500">
+                            {[...Array(order.review.rating)].map((_, i) => (
+                              <Star key={i} className="w-4 h-4 fill-current" />
+                            ))}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -240,6 +282,52 @@ export default function OrdersPage() {
                 />
               </div>
             )}
+          </div>
+        )}
+
+        {/* Review Modal */}
+        {isReviewModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-md w-full p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Beri Ulasan Pesanan</h2>
+              <p className="text-gray-600 mb-6">Bagaimana pengalaman laundry Anda bersama kami?</p>
+              
+              <div className="flex justify-center gap-2 mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setReviewRating(star)}
+                    className={`p-2 transition-colors ${reviewRating >= star ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-400'}`}
+                  >
+                    <Star className={`w-10 h-10 ${reviewRating >= star ? 'fill-current' : ''}`} />
+                  </button>
+                ))}
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Komentar (Opsional)</label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Tuliskan komentar Anda di sini..."
+                  className="w-full border border-gray-300 rounded-lg p-3 h-24 focus:ring-2 focus:ring-teal-500 focus:outline-none resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setIsReviewModalOpen(false)}>
+                  Batal
+                </Button>
+                <Button 
+                  onClick={handleSubmitReview} 
+                  disabled={isSubmittingReview || reviewRating === 0}
+                  className="bg-teal-500 hover:bg-teal-600 text-white"
+                >
+                  {isSubmittingReview ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Kirim Ulasan
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>

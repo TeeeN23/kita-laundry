@@ -126,7 +126,8 @@ class OrdersController < ApplicationController
         },
         pickupDate: order.created_at.iso8601,
         items: order.order_items.map { |item| { itemType: item.service.name, quantity: item.weight_kg } },
-        branch: order.branch ? { id: order.branch.id.to_s, name: order.branch.name } : nil
+        branch: order.branch ? { id: order.branch.id.to_s, name: order.branch.name } : nil,
+        review: order.review ? { rating: order.review.rating, comment: order.review.comment } : nil
       }
     end
 
@@ -224,6 +225,7 @@ class OrdersController < ApplicationController
         pincode: order.delivery_address.pincode,
         phone: order.delivery_address.phone
       } : nil,
+      review: order.review ? { rating: order.review.rating, comment: order.review.comment } : nil,
       statusHistory: [
         { status: 'placed', updatedAt: order.created_at.iso8601 },
         (order.status != 'pending' ? { status: mapped_status, updatedAt: order.updated_at.iso8601 } : nil)
@@ -270,8 +272,27 @@ class OrdersController < ApplicationController
     end
   end
 
-  def rate
-    render json: { success: true, message: 'Rating submitted' }
+  def review
+    order = current_user.orders.find(params[:id])
+    if order.status != 'completed'
+      return render json: { success: false, message: 'Pesanan belum selesai' }, status: :unprocessable_entity
+    end
+    if order.review.present?
+      return render json: { success: false, message: 'Pesanan sudah diulas' }, status: :unprocessable_entity
+    end
+
+    review = Review.new(
+      order: order,
+      user: current_user,
+      rating: params[:rating],
+      comment: params[:comment]
+    )
+
+    if review.save
+      render json: { success: true, review: review }
+    else
+      render json: { success: false, message: review.errors.full_messages.join(', ') }, status: :unprocessable_entity
+    end
   end
 
   def reorder

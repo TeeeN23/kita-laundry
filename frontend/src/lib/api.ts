@@ -105,7 +105,7 @@ export const customerAPI = {
   getOrder: (id: string) => api.get(`/orders/${id}`),
   getOrderTracking: (id: string) => api.get(`/orders/${id}/tracking`),
   cancelOrder: (id: string) => api.post(`/orders/${id}/cancel`),
-  rateOrder: (id: string, rating: any) => api.post(`/orders/${id}/rate`, rating),
+  submitReview: (id: string, rating: number, comment: string) => api.post(`/orders/${id}/review`, { rating, comment }),
   reorder: (id: string) => api.post(`/orders/${id}/reorder`),
   
   getAddresses: () => api.get('/addresses'),

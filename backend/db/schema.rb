@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_25_153042) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_25_171715) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,6 +103,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_153042) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "reviews", force: :cascade do |t|
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.bigint "order_id", null: false
+    t.integer "rating"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["order_id"], name: "index_reviews_on_order_id"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
   create_table "service_items", force: :cascade do |t|
     t.integer "base_price"
     t.string "category"
@@ -162,6 +173,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_153042) do
   add_foreign_key "orders", "addresses", column: "pickup_address_id"
   add_foreign_key "orders", "branches"
   add_foreign_key "orders", "users"
+  add_foreign_key "reviews", "orders"
+  add_foreign_key "reviews", "users"
   add_foreign_key "services", "branches"
   add_foreign_key "users", "branches"
 end

@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :addresses, dependent: :destroy
   has_many :orders, dependent: :restrict_with_error
+  has_many :reviews, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :assigned_orders, class_name: 'Order', foreign_key: 'assigned_staff_id'
   belongs_to :branch, optional: true

@@ -47,7 +47,7 @@ Rails.application.routes.draw do
     member do
       get :tracking
       post :cancel
-      post :rate
+      post :review
       post :reorder
     end
   end
