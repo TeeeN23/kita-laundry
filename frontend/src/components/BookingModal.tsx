@@ -246,7 +246,7 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired }: Booki
     if (orderItems.length === 0) return
     
     try {
-      const response = await fetch(`${API_URL}/services/calculate-pricing`, {
+      const response = await fetch(`${API_URL}/services/calculate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: orderItems, isExpress })
@@ -346,7 +346,7 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired }: Booki
     
     try {
       setSubmitting(true)
-      const response = await fetch(`${API_URL}/customer/orders`, {
+      const response = await fetch(`${API_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
