@@ -168,32 +168,33 @@ Untuk menguji *frontend* Vercel langsung ke *backend* lokal Anda, kita akan meng
 5. Masuk menggunakan akun **Center Admin** (`admin@kitalaundry.com`) untuk melihat data analitik, tabel seluruh pesanan, atau merespons tiket keluhan.
 
 ---
-### 🛠️ Tutorial Testing Fitur Keamanan (Rate Limiting)
+### 🛠️ Tutorial Testing Keamanan Sistem (Rate Limiting, reCAPTCHA & JWT)
 
-Fitur **Rate Limiting (Rack Attack)** akan memblokir *request* yang berlebihan (serangan DDoS atau *brute force*) dari satu IP.
-Untuk mengujinya, lakukan simulasi menggunakan aplikasi **Postman**, **cURL**, atau langsung melalui Browser:
+Sistem ini dilengkapi dengan pertahanan siber tiga lapis. Berikut cara mengujinya:
 
-**Cara Pengujian via cURL (Terminal):**
-Buka terminal dan jalankan *script* berikut secara berturut-turut untuk melakukan *hit* beruntun ke *endpoint* Login:
-```bash
-for i in {1..10}; do curl -i -X POST -H "Content-Type: application/json" -d '{"email":"test@test.com", "password":"123"}' http://localhost:8000/api/v1/auth/login; done
-```
-*   **Hasil yang Diharapkan:** Pada 5 panggilan pertama (dalam rentang waktu 20 detik), *server* akan mengembalikan respons `401 Unauthorized` (karena *password* salah). Namun, pada panggilan ke-6 dan seterusnya, *server* akan mengembalikan respons HTTP `429 Too Many Requests` dengan pesan *"Too Many Requests. Please wait and try again later."* 
-
+#### 1. Pengujian Rate Limiting (DDoS & Spam Protection)
+Fitur **Rack Attack** memblokir *request* berlebihan dari satu IP (contoh: maksimal 5 *request* per 20 detik untuk Login).
 **Cara Pengujian via Postman:**
-1. Buka aplikasi **Postman**.
-2. Buat *request* baru dengan metode **POST**.
-3. Masukkan URL: `http://localhost:8000/api/v1/auth/login`.
-4. Pindah ke tab **Body**, pilih **raw**, lalu ubah format menjadi **JSON**.
-5. Masukkan *payload* JSON berikut:
-   ```json
-   {
-     "email": "test@test.com",
-     "password": "123"
-   }
-   ```
-6. Klik tombol **Send** secara berulang-ulang dan cepat (minimal 6 kali).
-7. Pada *request* ke-6, Anda akan melihat status *response* berubah menjadi `429 Too Many Requests` beserta pesan error di bagian *body response*.
+1. Buat *request* **POST** ke `http://localhost:8000/api/v1/auth/login`.
+2. Di tab **Body** (raw/JSON), masukkan email dan password yang salah.
+3. Tekan **Send** secara berulang-ulang dengan cepat (lebih dari 5 kali).
+4. **Hasil:** Pada *request* ke-6, *response* akan berubah menjadi `429 Too Many Requests` (berhasil memblokir spammer).
+
+#### 2. Pengujian reCAPTCHA v3 (Bot Protection)
+Google reCAPTCHA v3 (Invisible) menilai apakah *request* berasal dari manusia atau bot, sebelum memproses *login* atau *registrasi*.
+**Cara Pengujian via Postman (Simulasi Serangan Bot):**
+1. Buat *request* **POST** ke `http://localhost:8000/api/v1/auth/login`.
+2. Masukkan email dan *password* admin/pelanggan yang **benar** di tab **Body**.
+3. **PENTING:** Jangan sertakan `recaptcha_token`, atau kirimkan nilai palsu: `"recaptcha_token": "token_asal"`.
+4. Tekan **Send**.
+5. **Hasil:** Meskipun kata sandi benar, *backend* akan mengembalikan error `400 Bad Request` atau `401 Unauthorized` dengan pesan *"Validasi reCAPTCHA gagal"*. Sistem terbukti kebal dari serangan *Direct API / Script Bot*.
+
+#### 3. Pengujian JWT (JSON Web Token)
+JWT berfungsi sebagai *ID Card* digital pengganti sesi (*session*) agar pengguna tidak perlu *login* berulang-ulang.
+**Cara Pengujian via Postman:**
+1. **Dapatkan Token:** Lakukan *login* (seperti biasa dengan mengirimkan token reCAPTCHA asli dari *browser* atau lewati reCAPTCHA jika ditiadakan sementara untuk tes). *Copy* string panjang `token` dari *response*.
+2. **Akses Ditolak (Tanpa JWT):** Buat *request* **GET** ke rute terproteksi (misal: `http://localhost:8000/api/v1/customer/profile`). Jangan isi apapun di tab *Authorization*. Klik **Send**. Hasilnya pasti `401 Unauthorized`.
+3. **Akses Diterima (Dengan JWT):** Pada *request* yang sama, buka tab **Authorization**, pilih **Bearer Token**, dan *paste* JWT tadi. Klik **Send**. Server akan mengembalikan `200 OK` berisi data rahasia profil pengguna.
 
 ---
 
