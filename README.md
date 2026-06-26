@@ -12,6 +12,9 @@ KitaLaundry adalah sistem manajemen operasional dan layanan binatu (laundry) yan
 - **Payment Gateway**: Integrasi **Xendit** (Pembuatan Invoice Otomatis & Webhook Callback).
 - **Penyimpanan Berkas**: **Cloudinary** (via ActiveStorage) untuk Avatar, Struk Pembayaran, dan Bukti Kondisi Pakaian.
 - **Notifikasi**: **Meta WhatsApp Cloud API** dengan kapabilitas *Production* (Nomor Terdaftar & System User Permanent Token).
+  - *Model Trigger (Pemicu)*: `backend/app/models/order.rb` (Menggunakan `after_create_commit` dan `after_update_commit`).
+  - *Background Job (Antrean Pekerjaan)*: `backend/app/jobs/whatsapp_notification_job.rb` (Menjalankan notifikasi secara asinkronus).
+  - *Service Layer (Logika API)*: `backend/app/services/whatsapp_service.rb` (Menangani HTTP Request langsung ke Graph API Meta dan pemformatan nomor telepon otomatis).
 - **Real-Time**: ActionCable (WebSockets) untuk pembaruan status pesanan secara langsung.
 - **Port Khusus**: Frontend (`:3000`), Backend (`:8000`).
 - **Autentikasi Nyata**: Sinkronisasi login ke DB PostgreSQL menggunakan token JWT asli, dilindungi enkripsi. Verifikasi email dikirim (simulasi) dengan **Letter Opener**.
