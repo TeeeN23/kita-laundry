@@ -68,48 +68,68 @@ module Admin
     end
 
     def analytics
-      branch_info = if current_user.role == 'center_admin'
-                      { _id: 'center', name: 'Admin Pusat', code: 'HQ' }
-                    else
-                      branch = Branch.find_by(id: get_branch_id)
-                      { _id: branch&.id.to_s, name: branch&.name || 'Cabang', code: "BR-#{branch&.id}" }
-                    end
+      timeframe = (params[:timeframe] || '7d').to_i
+      timeframe = 7 if timeframe <= 0
+      start_date = timeframe.days.ago.beginning_of_day
 
-      # Mock data for now to fix the API request failed issue
+      if current_user.role == 'center_admin'
+        orders = Order.where(created_at: start_date..Time.zone.now)
+        branch_info = { _id: 'center', name: 'Admin Pusat', code: 'HQ' }
+      elsif current_user.role == 'branch_manager'
+        orders = Order.where(branch_id: get_branch_id, created_at: start_date..Time.zone.now)
+        branch = Branch.find_by(id: get_branch_id)
+        branch_info = { _id: branch&.id.to_s, name: branch&.name || 'Cabang', code: "BR-#{branch&.id}" }
+      else
+        return render json: { errors: 'Unauthorized' }, status: :unauthorized
+      end
+
+      total_orders = orders.count
+      total_revenue = orders.where(payment_status: 'paid').sum(:total_price).to_f
+      avg_order_value = total_orders > 0 ? (total_revenue / total_orders).to_f : 0
+
+      daily_stats = (0..timeframe-1).to_a.reverse.map do |i|
+        date = i.days.ago.to_date
+        day_orders = orders.where(created_at: date.beginning_of_day..date.end_of_day)
+        {
+          _id: { year: date.year, month: date.month, day: date.day },
+          orders: day_orders.count,
+          revenue: day_orders.where(payment_status: 'paid').sum(:total_price).to_f
+        }
+      end
+
+      service_stats = orders.group(:service_type).count.map do |service_type, count|
+        {
+          _id: service_type || 'Lainnya',
+          count: count,
+          revenue: orders.where(service_type: service_type, payment_status: 'paid').sum(:total_price).to_f
+        }
+      end
+
+      status_distribution = orders.group(:status).count.map do |status, count|
+        { _id: status, count: count }
+      end
+
+      staff_performance = orders.where.not(assigned_staff_id: nil).group(:assigned_staff_id).count.map do |staff_id, count|
+        staff = User.find_by(id: staff_id)
+        {
+          name: staff&.first_name || 'Unknown',
+          ordersProcessed: count,
+          revenue: orders.where(assigned_staff_id: staff_id, payment_status: 'paid').sum(:total_price).to_f
+        }
+      end
+
       data = {
         branch: branch_info,
         timeframe: params[:timeframe] || '7d',
         totals: {
-          totalOrders: 145,
-          totalRevenue: 5250000,
-          avgOrderValue: 36200
+          totalOrders: total_orders,
+          totalRevenue: total_revenue,
+          avgOrderValue: avg_order_value
         },
-        dailyStats: [
-          { _id: { year: 2026, month: 6, day: 14 }, orders: 18, revenue: 650000 },
-          { _id: { year: 2026, month: 6, day: 15 }, orders: 22, revenue: 820000 },
-          { _id: { year: 2026, month: 6, day: 16 }, orders: 15, revenue: 540000 },
-          { _id: { year: 2026, month: 6, day: 17 }, orders: 25, revenue: 950000 },
-          { _id: { year: 2026, month: 6, day: 18 }, orders: 30, revenue: 1100000 },
-          { _id: { year: 2026, month: 6, day: 19 }, orders: 35, revenue: 1190000 }
-        ],
-        serviceStats: [
-          { _id: 'Cuci Komplit', count: 65, revenue: 2500000 },
-          { _id: 'Cuci Kering', count: 40, revenue: 1200000 },
-          { _id: 'Setrika Saja', count: 30, revenue: 900000 },
-          { _id: 'Cuci Sepatu', count: 10, revenue: 650000 }
-        ],
-        statusDistribution: [
-          { _id: 'placed', count: 15 },
-          { _id: 'in_process', count: 45 },
-          { _id: 'ready', count: 10 },
-          { _id: 'delivered', count: 75 }
-        ],
-        staffPerformance: [
-          { name: 'Budi Santoso', ordersProcessed: 45, revenue: 1800000 },
-          { name: 'Siti Aminah', ordersProcessed: 38, revenue: 1450000 },
-          { name: 'Ahmad Fauzi', ordersProcessed: 35, revenue: 1200000 },
-          { name: 'Dewi Lestari', ordersProcessed: 27, revenue: 800000 }
-        ]
+        dailyStats: daily_stats,
+        serviceStats: service_stats,
+        statusDistribution: status_distribution,
+        staffPerformance: staff_performance
       }
 
       render json: { success: true, data: data }, status: :ok
