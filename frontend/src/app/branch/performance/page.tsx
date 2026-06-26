@@ -565,7 +565,7 @@ export default function BranchPerformancePage() {
             <p className="text-sm text-gray-600">Completion Rate</p>
             <p className="text-lg font-bold text-green-600">
               {data.totals.totalOrders > 0 
-                ? Math.round((data.statusDistribution.find(s => s._id === 'delivered')?.count || 0) / data.totals.totalOrders * 100)
+                ? Math.round((data.statusDistribution.find(s => s._id === 'completed')?.count || 0) / data.totals.totalOrders * 100)
                 : 0}%
             </p>
           </div>

@@ -103,12 +103,16 @@ module Admin
         }
       end
 
-      service_stats = orders.group(:service_type).count.map do |service_type, count|
-        {
-          _id: service_type || 'Lainnya',
-          count: count,
-          revenue: orders.where(service_type: service_type, payment_status: 'paid').sum(:total_price).to_f
-        }
+      service_stats_hash = Hash.new { |h, k| h[k] = { count: 0, revenue: 0.0 } }
+      orders.includes(order_items: :service).find_each do |order|
+        order.order_items.each do |item|
+          service_name = item.service&.name || item.item_name || 'Lainnya'
+          service_stats_hash[service_name][:count] += 1
+          service_stats_hash[service_name][:revenue] += (item.unit_price.to_f * item.weight_kg.to_f)
+        end
+      end
+      service_stats = service_stats_hash.map do |name, data|
+        { _id: name, count: data[:count], revenue: data[:revenue] }
       end
 
       status_distribution = orders.group(:status).count.map do |status, count|
