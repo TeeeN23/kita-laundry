@@ -78,6 +78,34 @@ KitaLaundry adalah sistem manajemen operasional dan layanan binatu (laundry) yan
    ```bash
    npm run dev
    ```
+   ```bash
+   npm run dev
+   ```
+
+### 4. Cara Mengakses Database PostgreSQL via WSL
+Untuk melihat atau mengecek data tabel (seperti *users*, *orders*, dll) secara langsung melalui *command line* di WSL, Anda dapat menggunakan dua metode berikut:
+
+**Metode 1: Menggunakan Rails DBConsole (Paling Praktis)**
+Metode ini otomatis menghubungkan Anda ke *database* (`backend_development`) sesuai konfigurasi yang ada tanpa harus memasukkan kredensial manual.
+1. Buka terminal WSL dan masuk ke direktori *backend*:
+   ```bash
+   cd ~/KitaLaundry/backend
+   ```
+2. Jalankan perintah berikut:
+   ```bash
+   rails dbconsole
+   ```
+3. Layar terminal akan berubah menjadi `backend_development=>`. Anda sekarang bisa menjalankan perintah SQL murni, contoh: `SELECT * FROM users;`
+4. Untuk keluar dari *database*, ketik `\q` lalu tekan Enter.
+
+**Metode 2: Menggunakan Command PSQL Langsung**
+1. Buka terminal WSL.
+2. Jalankan perintah:
+   ```bash
+   psql -d backend_development
+   ```
+   *(Jika diminta password atau username, gunakan `psql -U postgres -d backend_development`)*
+3. Untuk keluar, ketik `\q` lalu tekan Enter.
 
 ---
 
