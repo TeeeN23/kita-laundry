@@ -120,30 +120,32 @@ export default function BranchPerformancePage() {
     if (!data) return
     
     const csvContent = [
-      ['Branch Performance Report'],
-      [`Branch: ${data.branch.name} (${data.branch.code})`],
-      [`Timeframe: ${timeframe}`],
+      ['========================================='],
+      ['        BRANCH PERFORMANCE REPORT        '],
+      ['========================================='],
+      [`Branch:,${data.branch.name} (${data.branch.code})`],
+      [`Timeframe:,${timeframe}`],
       [''],
-      ['Summary'],
+      ['--- 📊 SUMMARY ---'],
       ['Total Orders', data.totals.totalOrders],
-      ['Total Revenue', `Rp${data.totals.totalRevenue}`],
-      ['Avg Order Value', `Rp${Math.round(data.totals.avgOrderValue)}`],
+      ['Total Revenue', `Rp ${data.totals.totalRevenue.toLocaleString('id-ID')}`],
+      ['Avg Order Value', `Rp ${Math.round(data.totals.avgOrderValue).toLocaleString('id-ID')}`],
       [''],
-      ['Daily Stats'],
+      ['--- 📅 DAILY STATS ---'],
       ['Date', 'Orders', 'Revenue'],
       ...data.dailyStats.map(d => [
-        `${d._id.day}/${d._id.month}/${d._id.year}`,
+        `${String(d._id.day).padStart(2, '0')}/${String(d._id.month).padStart(2, '0')}/${d._id.year}`,
         d.orders,
-        `Rp${d.revenue}`
+        `Rp ${d.revenue.toLocaleString('id-ID')}`
       ]),
       [''],
-      ['Service Breakdown'],
-      ['Service', 'Count', 'Revenue'],
-      ...data.serviceStats.map(s => [s._id || 'Unknown', s.count, `Rp${s.revenue}`]),
+      ['--- 🏷️ SERVICE BREAKDOWN ---'],
+      ['Service Name', 'Total Count', 'Total Revenue'],
+      ...data.serviceStats.map(s => [s._id || 'Lainnya', s.count, `Rp ${s.revenue.toLocaleString('id-ID')}`]),
       [''],
-      ['Staff Performance'],
-      ['Name', 'Orders', 'Revenue'],
-      ...data.staffPerformance.map(s => [s.name, s.ordersProcessed, `Rp${s.revenue}`])
+      ['--- 👥 STAFF PERFORMANCE ---'],
+      ['Staff Name', 'Orders Processed', 'Revenue Generated'],
+      ...data.staffPerformance.map(s => [s.name, s.ordersProcessed, `Rp ${s.revenue.toLocaleString('id-ID')}`])
     ].map(row => row.join(',')).join('\n')
     
     const blob = new Blob([csvContent], { type: 'text/csv' })

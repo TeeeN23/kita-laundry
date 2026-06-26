@@ -68,8 +68,14 @@ module Admin
     end
 
     def analytics
-      timeframe = (params[:timeframe] || '7d').to_i
-      timeframe = 7 if timeframe <= 0
+      timeframe_param = params[:timeframe] || '7d'
+      if timeframe_param.include?('h')
+        timeframe = (timeframe_param.to_i / 24.0).ceil
+      else
+        timeframe = timeframe_param.to_i
+      end
+      timeframe = 1 if timeframe <= 0
+      
       start_date = timeframe.days.ago.beginning_of_day
 
       if current_user.role == 'center_admin'
